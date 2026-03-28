@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, Response
 import requests
 
 app = Flask(__name__)
@@ -25,6 +25,7 @@ def repolist():
             timeout=25
         )
         r.raise_for_status()
-        return jsonify(r.json())
+        # Return raw bytes directly — no re-encoding via jsonify()
+        return Response(r.content, mimetype="application/json")
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return Response('{"error":"' + str(e) + '"}', status=500, mimetype="application/json")
