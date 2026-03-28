@@ -1,5 +1,5 @@
 {
   "rewrites": [
-    { "source": "/repolist", "destination": "/api/repolist" }
+    { "source": "/repolist", "destination": "/api/index" }
   ]
 }
