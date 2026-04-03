@@ -1,5 +1,6 @@
 from flask import Flask, Response
 import requests
+import json
 
 app = Flask(__name__)
 
@@ -15,6 +16,8 @@ HEADERS = {
     "sec-fetch-site": "same-origin",
 }
 
+BASE_IMG_URL = "https://www.21strepos.com"
+
 @app.route("/")
 @app.route("/repolist")
 def repolist():
@@ -25,7 +28,17 @@ def repolist():
             timeout=25
         )
         r.raise_for_status()
-        # Return raw bytes directly — no re-encoding via jsonify()
-        return Response(r.content, mimetype="application/json")
+        data = r.json()
+
+        # Fix PIC field — build full URL
+        for listing in data:
+            pic = listing.get("PIC", "")
+            if pic and not pic.startswith("http"):
+                listing["PIC"] = BASE_IMG_URL + "/" + pic.lstrip("/")
+
+        return Response(
+            json.dumps(data),
+            mimetype="application/json"
+        )
     except Exception as e:
         return Response('{"error":"' + str(e) + '"}', status=500, mimetype="application/json")
